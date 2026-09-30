@@ -1,14 +1,60 @@
-<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10151b"><link rel="manifest" href="manifest.webmanifest"><title>MZÉÉMZIMÀ Music</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MZEEMZIMA MUSIC - Online</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0b0e12;color:#fff;font-family:Arial,sans-serif}header{padding:28px 16px;text-align:center;background:linear-gradient(145deg,#10151b,#252d36)}.logo{font-size:28px;font-weight:900;letter-spacing:2px}.sub{color:#aeb7c2;font-size:13px;margin-top:7px}main{max-width:760px;margin:auto;padding:16px}.card{background:#161b21;border:1px solid #303741;border-radius:19px;padding:16px;margin-bottom:14px}h2{font-size:17px;margin:0 0 12px}.row{display:flex;gap:9px}.row input{flex:1;padding:13px;border-radius:11px;border:1px solid #3a424c;background:#222931;color:#fff}button{border:0;border-radius:11px;padding:13px;font-weight:800;background:#e9edf1;color:#111}.low{background:#d8b44f}.songs button{width:100%;text-align:left;margin:6px 0;background:#222931;color:#fff}.now{text-align:center}.cover{width:155px;height:155px;border-radius:20px;margin:5px auto 14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#343d48,#101318);font-size:48px}.title{font-size:19px;font-weight:800}.artist{color:#9da6b0;margin:5px}audio{width:100%;margin-top:14px}.stats{text-align:center;color:#aab2bd;font-size:13px;line-height:1.8}.note{font-size:12px;color:#858f9a;text-align:center;line-height:1.5}#install{display:none;width:100%;margin-top:10px;background:#55d47a}
-</style></head>
-<body><header><div class="logo">MZÉÉMZIMÀ MUSIC</div><div class="sub">LIGHTWEIGHT • LOW-DATA MUSIC PLAYER</div></header>
-<main><div class="card"><h2>🎵 Your Music</h2><div class="row"><input id="search" placeholder="Search music..."><button onclick="files.click()">＋ ADD</button><input id="files" type="file" accept="audio/*" multiple hidden></div><button id="install">📱 INSTALL APP</button><div class="songs" id="songs"></div></div>
-<div class="card now"><div class="cover">🎧</div><div class="title" id="title">No song selected</div><div class="artist" id="artist">Add your own or authorized music</div><audio id="player" controls preload="metadata"></audio><div style="margin-top:12px"><button class="low" id="low">📶 LOW-DATA MODE: ON</button></div></div>
-<div class="card stats"><div>Estimated session data: <b id="data">0.00 MB</b></div><div>Selected estimate: <b id="rate">32 kbps</b></div><div>Playing time: <b id="time">0:00</b></div></div>
-<p class="note">Lightweight player for audio you provide or are authorized to stream. This version plays selected files stored on your phone.</p></main>
+:root{--bg:#0a0a0f;--card:#1a1a24;--accent:#f5c518;--text:#fff;--muted:#9aa0b3}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);padding-bottom:90px}
+header{padding:20px;text-align:center;background:linear-gradient(180deg,#1c1c2b,#0a0a0f);position:sticky;top:0;z-index:10}
+header h1{font-size:22px;letter-spacing:2px}
+header p{color:var(--muted);font-size:12px;margin-top:4px}
+.search-wrap{padding:12px 16px;position:sticky;top:76px;z-index:9;background:var(--bg)}
+.search{display:flex;gap:8px}
+.search input{flex:1;background:var(--card);border:1px solid #2a2a3a;color:#fff;padding:14px;border-radius:12px;outline:none}
+.search button{background:var(--accent);border:0;padding:0 18px;border-radius:12px;font-weight:700;color:#000}
+.chips{display:flex;gap:8px;overflow:auto;padding:12px 16px}
+.chip{white-space:nowrap;background:#222233;border:1px solid #2a2a3a;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer}
+.list{padding:0 16px;display:grid;gap:10px}
+.song{display:flex;gap:12px;align-items:center;background:var(--card);padding:10px;border-radius:14px;border:1px solid #222233}
+.song img{width:56px;height:56px;border-radius:10px;object-fit:cover}
+.song.meta{flex:1;min-width:0}
+.song.meta b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.song.meta span{color:var(--muted);font-size:12px}
+.play-btn{width:38px;height:38px;border-radius:50%;background:var(--accent);border:0;display:grid;place-items:center;color:#000;font-size:16px}
+.player{position:fixed;left:0;right:0;bottom:0;background:#15151f;border-top:1px solid #2a2a3a;padding:10px 14px;display:flex;gap:12px;align-items:center}
+.player img{width:48px;height:48px;border-radius:8px}
+.player.p-meta{flex:1;min-width:0}
+.player.p-meta b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player audio{width:100%;height:32px;margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+<h1>MZÉÉMZIMÀ MUSIC</h1>
+<p>ONLINE • REAL STREAMING • NO DATA WASTE</p>
+</header>
+<div class="search-wrap">
+<div class="search"><input id="q" placeholder="Search any artist e.g. Bien, Diamond"><button onclick="doSearch()">GO</button></div>
+</div>
+<div class="chips" id="chips"></div>
+<div class="list" id="list"></div>
+<div class="player" id="player" style="display:none">
+<img id="pimg" src="">
+<div class="p-meta"><b id="ptitle">No song</b><span id="partist" style="color:var(--muted);font-size:11px"></span><audio id="audio" controls></audio></div>
+</div>
 <script>
-const files=document.getElementById('files'),songs=document.getElementById('songs'),player=document.getElementById('player'),title=document.getElementById('title'),artist=document.getElementById('artist'),data=document.getElementById('data'),time=document.getElementById('time'),search=document.getElementById('search');let library=[],rate=32;
-files.onchange=e=>{for(const f of e.target.files)library.push({name:f.name,url:URL.createObjectURL(f)});render()};function render(){const q=search.value.toLowerCase();songs.innerHTML='';library.filter(x=>x.name.toLowerCase().includes(q)).forEach((x,i)=>{let b=document.createElement('button');b.textContent='▶  '+x.name;b.onclick=()=>play(i);songs.appendChild(b)});if(!library.length)songs.innerHTML='<p class="note">Add audio files from your phone to create your library.</p>'}search.oninput=render;function play(i){let x=library[i];player.src=x.url;title.textContent=x.name.replace(/\.[^/.]+$/,'');artist.textContent='MZÉÉMZIMÀ Music';player.play()}player.ontimeupdate=()=>{let sec=Math.floor(player.currentTime);time.textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');data.textContent=((player.currentTime*rate/8)/1000).toFixed(2)+' MB'};document.getElementById('low').onclick=()=>{rate=rate===32?64:32;document.getElementById('low').textContent='📶 LOW-DATA MODE: '+(rate===32?'ON':'OFF');document.getElementById('rate').textContent=rate+' kbps'};let deferred;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;install.style.display='block'});install.onclick=async()=>{if(deferred){deferred.prompt();deferred=null;install.style.display='none'}};if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));render();
-</script></body></html>
+const chipsData=["Bien","Diamond Platnumz","Sauti Sol","Nyashinski","Otile Brown","Zuchu","Rayvanny","Harmonize"];
+const chipsEl=document.getElementById('chips');const listEl=document.getElementById('list');let currentSongs=[];
+function renderChips(){chipsEl.innerHTML=chipsData.map(c=>`<div class="chip" onclick="searchArtist('${c}')">${c}</div>`).join('')}
+renderChips();
+function searchArtist(name){document.getElementById('q').value=name;doSearch()}
+async function doSearch(){const term=document.getElementById('q').value.trim()||'Bien';listEl.innerHTML='<p style="color:#888;padding:20px;text-align:center">Searching...</p>';try{const res=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=30&entity=song`);const data=await res.json();currentSongs=data.results;if(currentSongs.length===0){listEl.innerHTML='<p style="color:#888;padding:20px;text-align:center">No results</p>';return}renderList()}catch(e){listEl.innerHTML='<p style="color:#888;padding:20px">Error: '+e+'</p>'}}
+function renderList(){listEl.innerHTML=currentSongs.map((s,i)=>`<div class="song"><img src="${s.artworkUrl100.replace('100x100','200x200')}"><div class="meta"><b>${s.trackName}</b><span>${s.artistName}</span></div><button class="play-btn" onclick="playSong(${i})">▶</button></div>`).join('')}
+function playSong(i){const s=currentSongs[i];document.getElementById('player').style.display='flex';document.getElementById('pimg').src=s.artworkUrl100.replace('100x100','200x200');document.getElementById('ptitle').textContent=s.trackName;document.getElementById('partist').textContent=s.artistName;const audio=document.getElementById('audio');audio.src=s.previewUrl;audio.play()}
+doSearch();
+</script>
+</body>
+</html>
