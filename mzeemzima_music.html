@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MZÉÉMZIMÀ Music</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0d10;color:#fff;font-family:Arial,sans-serif}
+header{padding:25px 18px;text-align:center;background:linear-gradient(145deg,#11161c,#252c34)}
+.logo{font-size:28px;font-weight:900;letter-spacing:2px}.sub{color:#aab2bd;font-size:13px;margin-top:6px}
+main{max-width:760px;margin:auto;padding:16px}.card{background:#161a20;border:1px solid #2d333b;border-radius:18px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 12px}.row{display:flex;gap:9px}.row input{flex:1;padding:13px;border-radius:11px;border:1px solid #3a414a;background:#222830;color:white}
+button{border:0;border-radius:11px;padding:13px;font-weight:800;background:#e9edf1;color:#111}
+button.low{background:#d7b34f}.songs button{width:100%;text-align:left;margin:6px 0;background:#222830;color:#fff}
+.now{text-align:center}.cover{width:150px;height:150px;border-radius:18px;margin:5px auto 14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#303844,#101318);font-size:45px}
+.title{font-size:19px;font-weight:800}.artist{color:#9da6b0;margin:5px}
+audio{width:100%;margin-top:14px}
+.stats{text-align:center;color:#aab2bd;font-size:13px;line-height:1.7}
+.note{font-size:12px;color:#858f9a;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">MZÉÉMZIMÀ MUSIC</div>
+<div class="sub">LIGHTWEIGHT • LOW-DATA MUSIC PLAYER</div>
+</header>
+<main>
+<div class="card">
+<h2>🎵 Music Library</h2>
+<div class="row">
+<input id="search" placeholder="Search your music...">
+<button onclick="document.getElementById('files').click()">＋ ADD</button>
+<input id="files" type="file" accept="audio/*" multiple hidden>
+</div>
+<div class="songs" id="songs"></div>
+</div>
+
+<div class="card now">
+<div class="cover">🎧</div>
+<div class="title" id="title">No song selected</div>
+<div class="artist" id="artist">Add your own music to begin</div>
+<audio id="player" controls preload="metadata"></audio>
+<div style="margin-top:12px">
+<button class="low" id="low">📶 LOW-DATA MODE: ON</button>
+</div>
+</div>
+
+<div class="card stats">
+<div>Session data estimate: <b id="data">0.00 MB</b></div>
+<div>Estimated bitrate: <b id="rate">32 kbps</b></div>
+<div>Playing time: <b id="time">0:00</b></div>
+</div>
+
+<p class="note">
+This first version plays audio stored on your device. It does not download commercial music.
+For online streaming, use audio you own or have permission to stream.
+Low-data mode targets a lightweight player, but actual data usage depends on the audio source/bitrate.
+</p>
+</main>
+
+<script>
+const files=document.getElementById('files'), songs=document.getElementById('songs');
+const player=document.getElementById('player'), title=document.getElementById('title'), artist=document.getElementById('artist');
+const data=document.getElementById('data'), time=document.getElementById('time'), search=document.getElementById('search');
+let library=[], start=0, playing=false, rate=32;
+
+files.onchange=e=>{
+ for(const f of e.target.files){
+   library.push({name:f.name,url:URL.createObjectURL(f)});
+ }
+ render();
+};
+
+function render(){
+ const q=search.value.toLowerCase();
+ songs.innerHTML='';
+ library.filter(x=>x.name.toLowerCase().includes(q)).forEach((x,i)=>{
+   const b=document.createElement('button');
+   b.textContent='▶  '+x.name;
+   b.onclick=()=>play(i);
+   songs.appendChild(b);
+ });
+ if(!library.length) songs.innerHTML='<p class="note">Add audio files from your phone to create your library.</p>';
+}
+search.oninput=render;
+
+function play(i){
+ const x=library[i]; if(!x)return;
+ player.src=x.url; title.textContent=x.name.replace(/\.[^/.]+$/,''); artist.textContent='MZÉÉMZIMÀ Music';
+ player.play(); start=Date.now(); playing=true;
+}
+player.onplay=()=>{playing=true;if(!start)start=Date.now()};
+player.onpause=()=>playing=false;
+player.ontimeupdate=()=>{
+ const sec=Math.floor(player.currentTime);
+ time.textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+ const mb=(player.currentTime*rate/8)/1000;
+ data.textContent=mb.toFixed(2)+' MB';
+};
+document.getElementById('low').onclick=()=>{
+ rate=rate===32?64:32;
+ document.getElementById('low').textContent='📶 LOW-DATA MODE: '+(rate===32?'ON':'OFF');
+ document.getElementById('rate').textContent=rate+' kbps';
+};
+render();
+</script>
+</body>
+</html>
